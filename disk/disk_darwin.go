@@ -109,3 +109,11 @@ func Getfsstat(buf []Statfs_t, flags int) (n int, err error) {
 func getFsType(stat syscall.Statfs_t) string {
 	return common.IntToString(stat.Fstypename[:])
 }
+
+func GetDiskDevId(name string) (devId uint64, err error) {
+	return 0, common.ErrNotImplementedError
+}
+
+func MakeDeviceId(major, minor int32) uint64 {
+	return 0
+}

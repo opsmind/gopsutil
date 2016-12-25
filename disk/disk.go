@@ -33,6 +33,7 @@ type PartitionStat struct {
 }
 
 type IOCountersStat struct {
+	DeviceId         uint64 `json:"deviceId"`
 	ReadCount        uint64 `json:"readCount"`
 	MergedReadCount  uint64 `json:"mergedReadCount"`
 	WriteCount       uint64 `json:"writeCount"`

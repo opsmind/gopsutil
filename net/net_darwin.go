@@ -222,7 +222,7 @@ func IOCounters(pernic bool) ([]IOCountersStat, error) {
 			}
 			if truncated {
 				// run netstat with -I$ifacename
-				if out, err = invoke.Command(netstat, "-ibdnWI" + interfaceName);err != nil {
+				if out, err = invoke.Command(netstat, "-ibdnWI"+interfaceName); err != nil {
 					return nil, err
 				}
 				parsedIfaces, err := parseNetstatOutput(string(out))
@@ -264,4 +264,12 @@ func FilterCounters() ([]FilterStat, error) {
 // Not Implemented for Darwin
 func ProtoCounters(protocols []string) ([]ProtoCountersStat, error) {
 	return nil, errors.New("NetProtoCounters not implemented for darwin")
+}
+
+func BondingInterfaces() (bonds []string, err error) {
+	return nil, errors.New("BondingInterfaces not implemented for darwin")
+}
+
+func GetInterfaceType(name string) (InterfaceType, error) {
+	return 0, errors.New("GetInterfaceType not implemented for darwin")
 }
