@@ -29,7 +29,6 @@ type IOCountersStat struct {
 	Dropout     uint64 `json:"dropout"`     // total number of outgoing packets which were dropped (always 0 on OSX and BSD)
 	Fifoin      uint64 `json:"fifoin"`      // total number of FIFO buffers errors while receiving
 	Fifoout     uint64 `json:"fifoout"`     // total number of FIFO buffers errors while sending
-
 }
 
 // Addr is implemented compatibility to psutil
@@ -72,6 +71,13 @@ type FilterStat struct {
 	ConnTrackCount int64 `json:"conntrackCount"`
 	ConnTrackMax   int64 `json:"conntrackMax"`
 }
+
+type InterfaceType uint32
+
+const (
+	InterfacePhysical = 1
+	InterfaceVirtual  = 2
+)
 
 var constMap = map[string]int{
 	"TCP":  syscall.SOCK_STREAM,
@@ -117,7 +123,6 @@ func Interfaces() ([]InterfaceStat, error) {
 	}
 	ret := make([]InterfaceStat, 0, len(is))
 	for _, ifi := range is {
-
 		var flags []string
 		if ifi.Flags&net.FlagUp != 0 {
 			flags = append(flags, "up")

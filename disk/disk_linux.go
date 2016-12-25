@@ -9,6 +9,8 @@ import (
 	"strings"
 	"syscall"
 
+	"os"
+
 	"github.com/shirou/gopsutil/internal/common"
 )
 
@@ -287,6 +289,14 @@ func IOCounters() (map[string]IOCountersStat, error) {
 			// malformed line in /proc/diskstats, avoid panic by ignoring.
 			continue
 		}
+		major, err := strconv.ParseInt((fields[0]), 10, 32)
+		if err != nil {
+			return ret, err
+		}
+		minor, err := strconv.ParseInt((fields[1]), 10, 32)
+		if err != nil {
+			return ret, err
+		}
 		name := fields[2]
 		reads, err := strconv.ParseUint((fields[3]), 10, 64)
 		if err != nil {
@@ -333,6 +343,7 @@ func IOCounters() (map[string]IOCountersStat, error) {
 			return ret, err
 		}
 		d := IOCountersStat{
+			DeviceId:         MakeDeviceId(int32(major), int32(minor)),
 			ReadBytes:        rbytes * SectorSize,
 			WriteBytes:       wbytes * SectorSize,
 			ReadCount:        reads,
@@ -381,6 +392,27 @@ func GetDiskSerialNumber(name string) string {
 		return values[1]
 	}
 	return ""
+}
+
+// GetDiskDevId returns devive ID of given device or error.
+// Name of device is expected, eg. /dev/sda
+func GetDiskDevId(name string) (devId uint64, err error) {
+	// man lstat(2)
+	fi, err := os.Lstat(name)
+	if err != nil {
+		return 0, err
+	}
+	if v := fi.Sys(); v != nil {
+		statt, ok := v.(*syscall.Stat_t)
+		if ok {
+			return statt.Rdev, nil
+		}
+	}
+	return 0, nil
+}
+
+func MakeDeviceId(major, minor int32) uint64 {
+	return uint64((major << 8) + minor)
 }
 
 func getFsType(stat syscall.Statfs_t) string {

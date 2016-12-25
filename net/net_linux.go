@@ -13,6 +13,8 @@ import (
 	"strings"
 	"syscall"
 
+	"bytes"
+
 	"github.com/shirou/gopsutil/internal/common"
 )
 
@@ -717,4 +719,53 @@ func updateMap(src map[string][]inodeMap, add map[string][]inodeMap) map[string]
 		src[key] = append(a, value...)
 	}
 	return src
+}
+
+func BondingInterfaces() (bonds []string, err error) {
+	filename := common.HostSys("class/net/bonding_masters")
+	content, err := ioutil.ReadFile(filename)
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = nil
+		}
+		return nil, err
+	}
+	if len(content) == 0 {
+		return
+	}
+	if content[len(content)-1] == 0x0a {
+		content = content[:len(content)-1]
+	}
+	for {
+		pos := bytes.IndexByte(content, 0x20)
+		if pos > 0 {
+			bonds = append(bonds, string(content[:pos]))
+		} else if pos < 0 {
+			bonds = append(bonds, string(content))
+			break
+		}
+		content = content[pos+1:]
+	}
+	return
+}
+
+func GetInterfaceType(name string) (InterfaceType, error) {
+	filename := common.HostSys("class/net/" + name)
+	dst, err := os.Readlink(filename)
+	if err != nil {
+		return 0, err
+	}
+	prefix := "../../devices/"
+	if len(dst) <= len(prefix) {
+		return 0, nil
+	}
+	dst = dst[len(prefix):]
+	pos := strings.IndexAny(dst, "/")
+	if pos < 0 {
+		return 0, nil
+	}
+	if dst[:pos] == "virtual" {
+		return InterfaceVirtual, nil
+	}
+	return InterfacePhysical, nil
 }
