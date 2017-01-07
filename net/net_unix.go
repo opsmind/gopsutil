@@ -77,3 +77,7 @@ func ConnectionsPid(kind string, pid int32) ([]ConnectionStat, error) {
 func ConnectionsPidMax(kind string, pid int32, max int) ([]ConnectionStat, error) {
 	return []ConnectionStat{}, common.ErrNotImplementedError
 }
+
+func (n ConnectionStat) Protocol() string {
+	return "unknown"
+}

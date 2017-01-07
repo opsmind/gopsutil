@@ -93,3 +93,7 @@ func FilterCounters() ([]FilterStat, error) {
 func ProtoCounters(protocols []string) ([]ProtoCountersStat, error) {
 	return nil, errors.New("NetProtoCounters not implemented for windows")
 }
+
+func (n ConnectionStat) Protocol() string {
+	return "unknown"
+}
