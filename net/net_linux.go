@@ -257,6 +257,28 @@ var kindUNIX = netConnectionKindType{
 	filename: "unix",
 }
 
+func (n ConnectionStat) Protocol() string {
+	switch n.Family {
+	case syscall.AF_INET:
+		switch n.Type {
+		case syscall.SOCK_STREAM:
+			return "tcp"
+		case syscall.SOCK_DGRAM:
+			return "udp"
+		}
+	case syscall.AF_INET6:
+		switch n.Type {
+		case syscall.SOCK_STREAM:
+			return "tcp6"
+		case syscall.SOCK_DGRAM:
+			return "udp6"
+		}
+	case syscall.AF_UNIX:
+		return "unix"
+	}
+	return "unknown"
+}
+
 var netConnectionKindMap = map[string][]netConnectionKindType{
 	"all":   []netConnectionKindType{kindTCP4, kindTCP6, kindUDP4, kindUDP6, kindUNIX},
 	"tcp":   []netConnectionKindType{kindTCP4, kindTCP6},

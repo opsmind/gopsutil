@@ -273,3 +273,7 @@ func BondingInterfaces() (bonds []string, err error) {
 func GetInterfaceType(name string) (InterfaceType, error) {
 	return 0, errors.New("GetInterfaceType not implemented for darwin")
 }
+
+func (n ConnectionStat) Protocol() string {
+	return "unknown"
+}
